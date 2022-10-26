@@ -103,14 +103,27 @@ namespace Fallout76_Patcher
 
         private static bool CRCPatch()
         {
+            string output = string.Empty;
 
             Process fcrc32 = new();
             fcrc32.StartInfo.FileName = "fcrc32.bat";
             fcrc32.StartInfo.UseShellExecute = false;
             fcrc32.StartInfo.RedirectStandardOutput = true;
+            fcrc32.StartInfo.RedirectStandardError = true;
+            fcrc32.OutputDataReceived += (s, e) =>
+            {
+                if (e.Data != null)
+                {
+                    Console.WriteLine(e.Data);
+                    output += e.Data;
+                }
+            };
+            fcrc32.ErrorDataReceived += (s, e) => { };
             fcrc32.Start();
+            fcrc32.BeginOutputReadLine();
+            fcrc32.BeginErrorReadLine();
             fcrc32.WaitForExit();
-            string output = fcrc32.StandardOutput.ReadToEnd();
+           
 
             if (!output.Contains("New CRC-32 successfully verified")) 
             {
