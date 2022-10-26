@@ -8,7 +8,6 @@ Automatically patch SeventySix.esm with a range of different patches.
 - Automatic CRC Signature patch
 
 # Requirements
-- [.NET Runtime for Console Apps](https://dotnet.microsoft.com/en-us/download)
 - [Python](https://www.python.org/downloads/)
 
 # Usage
