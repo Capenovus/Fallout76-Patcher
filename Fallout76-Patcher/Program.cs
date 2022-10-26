@@ -23,6 +23,8 @@ namespace Fallout76_Patcher
                 else organizedPatches.Add(new(x.Item1, new() { new(x.Item2, x.Item3) }, x.Item4));
             });
 
+            organizedPatches.Sort();
+
             while(true)
             {
                 Console.Clear();
