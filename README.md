@@ -18,6 +18,6 @@ Automatically patch SeventySix.esm with a range of different patches.
 
 # Credits
 
-Byte patterns taken from [Sushi96](https://github.com/Suchi96/Fallout-76-Modding)
+Byte patterns taken from [Suchi96](https://github.com/Suchi96/Fallout-76-Modding)
 <br>
 If you have additional scripts to contribute, feel free to do so
