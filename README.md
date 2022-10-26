@@ -13,8 +13,9 @@ Automatically patch SeventySix.esm with a range of different patches.
 
 # Usage
 1. Put `SeventySix.esm` in the same folder as the Patcher
-2. Run the Patcher and select your desired patches
-3. Copy the new `SeventySix.esm` file to `%localappdata%\Fallout76\associated_media\data\SeventySix.esm`
+2. Ensure that the specified CRC Value in `fcrc32.bat` is up to date
+3. Run the Patcher and select your desired patches
+4. Copy the new `SeventySix.esm` file to `%localappdata%\Fallout76\associated_media\data\SeventySix.esm`
 
 # Credits
 
