@@ -4,7 +4,7 @@ Automatically patch SeventySix.esm with a range of different patches.
 
 # Features
 
-- Individual patch selection / Apply all available patches
+- Automatic hex pattern patching
 - Automatic CRC Signature patch
 
 # Requirements
