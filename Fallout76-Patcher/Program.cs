@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace Fallout76_Patcher
 {
@@ -43,16 +44,36 @@ namespace Fallout76_Patcher
 
                 Console.Write("\nSelection: ");
                 string? selection = Console.ReadLine();
-                if (!int.TryParse(selection, out int sel)) continue;
-                if (sel > organizedPatches.Count + 2 || sel < 0) continue;
-                if (sel == organizedPatches.Count + 2) break;
-                else if (sel == organizedPatches.Count + 1) organizedPatches.Patch();
-                else if (sel == organizedPatches.Count) organizedPatches.Where(z => z.Item3).Select(z => z).ToList().Patch();
-                else organizedPatches.Where(z => z.Item1.Equals(organizedPatches[sel].Item1)).Select(z => z).ToList().Patch();
+                selection = Regex.Replace(selection, "[^0-9$.,]", "");
 
-                Console.WriteLine("\nFinished Writing Patches".Pastel(Colors.SUCCESS));
-                Console.Write("Press any key to continue...");
-                Console.ReadKey();
+                List<int> spp = new();
+                if (!int.TryParse(selection, out int s1))
+                {
+                    string[] selSplit = selection.ToString().Split(',');
+                    if (selSplit.Length > 1)
+                    {
+                        for (int i = 0; i < selSplit.Length; i++)
+                        {
+                            if (int.TryParse(selSplit[i], out int s))
+                                spp.Add(s);
+                        }
+                        if (spp.Contains(organizedPatches.Count + 2)) break;
+                    }
+                    else break;
+                }
+                else spp.Add(s1);
+
+                for (int i = 0; i < spp.Count; i++)
+                {
+                    int sel = spp[i];
+                    if (sel > organizedPatches.Count + 2 || sel < 0) continue;
+                    if (sel == organizedPatches.Count + 2) break;
+                    else if (spp.Contains(organizedPatches.Count + 1)) { organizedPatches.Patch(); break; }
+                    else if (sel == organizedPatches.Count) organizedPatches.Where(z => z.Item3).Select(z => z).ToList().Patch();
+                    else organizedPatches.Where(z => z.Item1.Equals(organizedPatches[sel].Item1)).Select(z => z).ToList().Patch();
+                }
+
+                Patcher.Finish();
             }
         }
     }
@@ -87,20 +108,28 @@ namespace Fallout76_Patcher
                             fs.Close();
                         }
                     }
-
                     if (missing)
                         Console.WriteLine("[WARNING] ".Pastel(Colors.WARNING) + "Not all patches could be applied");
                     else Console.WriteLine("[INFO] ".Pastel(Colors.INFO) + $"{patchlist.Item1} patched");
                 }
                 Console.Title = title;
-                Console.WriteLine("[STATUS] ".Pastel(Colors.STATUS) + "Replacing CRC Sig");
-                if (!CRCPatch()) Console.WriteLine("[ERROR] ".Pastel(Colors.ERROR) + "Failed to patch CRC Sig");
-                Console.WriteLine("[INFO] ".Pastel(Colors.INFO) + "DONE");
+                
             }
             catch (Exception e)
             {
                 Console.WriteLine("[ERROR] ".Pastel(Colors.ERROR) + $"{e.Message}");
             }
+        }
+
+        public static void Finish()
+        {
+            Console.WriteLine("[STATUS] ".Pastel(Colors.STATUS) + "Replacing CRC Sig");
+            if (!CRCPatch()) Console.WriteLine("[ERROR] ".Pastel(Colors.ERROR) + "Failed to patch CRC Sig");
+            Console.WriteLine("[INFO] ".Pastel(Colors.INFO) + "DONE");
+            Console.WriteLine("\nFinished Writing Patches".Pastel(Colors.SUCCESS));
+
+            Console.Write("Press any key to continue...");
+            Console.ReadKey();
         }
 
         private static bool CRCPatch()
