@@ -16,12 +16,12 @@ namespace Fallout76_Patcher
                 return;
             }
 
-            List<Tuple<string, List<Tuple<byte[], byte[]>>, bool>> organizedPatches = new();
+            List<Tuple<string, List<Tuple<byte[], byte[], byte[]>>, bool>> organizedPatches = new();
 
             Patch.Patches.ForEach(x => {
                 if (organizedPatches.Where(z => z.Item1.Equals(x.Item1)).Select(z => z).ToList().Count > 0)
-                    organizedPatches.Where(z => z.Item1.Equals(x.Item1)).Select(z => z).First().Item2.Add(new(x.Item2, x.Item3));
-                else organizedPatches.Add(new(x.Item1, new() { new(x.Item2, x.Item3) }, x.Item4));
+                    organizedPatches.Where(z => z.Item1.Equals(x.Item1)).Select(z => z).First().Item2.Add(new(x.Item2, x.Item3, x.Item5));
+                else organizedPatches.Add(new(x.Item1, new() { new(x.Item2, x.Item3, x.Item5) }, x.Item4));
             });
 
             organizedPatches.Sort();
@@ -67,7 +67,7 @@ namespace Fallout76_Patcher
                 {
                     int sel = spp[i];
                     if (sel > organizedPatches.Count + 2 || sel < 0) continue;
-                    if (sel == organizedPatches.Count + 2) break;
+                    if (sel == organizedPatches.Count + 2) return;
                     else if (spp.Contains(organizedPatches.Count + 1)) { organizedPatches.Patch(); break; }
                     else if (sel == organizedPatches.Count) organizedPatches.Where(z => z.Item3).Select(z => z).ToList().Patch();
                     else organizedPatches.Where(z => z.Item1.Equals(organizedPatches[sel].Item1)).Select(z => z).ToList().Patch();
@@ -80,7 +80,7 @@ namespace Fallout76_Patcher
 
     public static class Patcher
     {
-        public static void Patch(this List<Tuple<string, List<Tuple<byte[], byte[]>>, bool>> patches)
+        public static void Patch(this List<Tuple<string, List<Tuple<byte[], byte[], byte[]>>, bool>> patches)
         {
             try
             {
@@ -96,7 +96,17 @@ namespace Fallout76_Patcher
                     {
                         Console.Title = $"Patching {patchlist.Item1} ({patchlist.Item2.IndexOf(patch)}/{patchlist.Item2.Count})";
 
-                        long[] positions = contents.Locate(patch.Item1).ToArray();
+                        long[] positions = Array.Empty<long>();                
+                        if (patch.Item3 != Array.Empty<byte>()) 
+                        {
+                            int skip = (int)contents.LocateFirst(patch.Item3);
+                            byte[] skipped = contents.Skip(skip).ToArray();
+                            long nextEDID = skipped.LocateFirst(new byte[] { 0x45, 0x44, 0x49, 0x44 }); // EDID
+                            long pos = skipped.LocateFirst(patch.Item1) + skip;
+                            if (pos - skip >= nextEDID)
+                            positions = new long[] { pos };
+                        }
+                        else positions = contents.Locate(patch.Item1).ToArray();
                         if (positions.Length == 0) missing = true;
                         foreach (int position in positions)
                         {
@@ -117,7 +127,7 @@ namespace Fallout76_Patcher
             }
             catch (Exception e)
             {
-                Console.WriteLine("[ERROR] ".Pastel(Colors.ERROR) + $"{e.Message}");
+                Console.WriteLine("[ERROR] ".Pastel(Colors.ERROR) + $"{e.Message} : {e.StackTrace}");
             }
         }
 

@@ -21,6 +21,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="COPY TO GAME DIR.BAT">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="fcrc32.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
